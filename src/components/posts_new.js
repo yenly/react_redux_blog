@@ -1,9 +1,28 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import { reduxForm } from 'redux-form';
 import { createPost } from '../actions/index';
 import { Link } from 'react-router';
 
 class PostsNew extends Component {
+  static contextTypes = {
+    // this gives us access to property called this.context.router
+    router: PropTypes.object
+  };
+
+  onSubmit(props) {
+    // createPost is an action creator that creates a promise as its payload.
+    // whenever we call this action, this call will return the same promise
+    // when promise is resolved, it means blog post is successfully created
+    // perfect location to make sure navigation occurs.
+    this.props.createPost(props)
+      .then(() => {
+        // blog post has been created, navigate the user to the index
+        // we navigate by calling this.context.router.push with the
+        // new path to navigate to.
+        this.context.router.push('/');
+      });
+  }
+
   render() {
     // const handleSubmit = this.props.handleSubmit;
     // es6 shortcut syntax for above code
@@ -13,7 +32,7 @@ class PostsNew extends Component {
 
     return (
       // handleSubmit calls action creator
-      <form onSubmit={handleSubmit(this.props.createPost)}>
+      <form onSubmit={handleSubmit(this.onSubmit.bind(this))}>
         <h3>Create A New Post</h3>
         <div className={`form-group ${title.touched && title.invalid ? 'has-danger' : ''}`}>
           <label>Title</label>
